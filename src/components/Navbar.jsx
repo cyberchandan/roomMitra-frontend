@@ -1,17 +1,42 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 /*
   Fully Responsive Navbar
   - Desktop horizontal
   - Mobile hamburger
-  - Fix overflow issue
+  - Auth dynamic (Login / Logout)
 */
 
 function Navbar({ setCategory, activeCategory }) {
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  /* ===== Check Auth Status ===== */
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    };
+
+    checkAuth();
+
+    // Re-check when storage changes
+    window.addEventListener("storage", checkAuth);
+
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+    };
+  }, []);
+
+  /* ===== Logout ===== */
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    navigate("/");
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-md">
@@ -22,7 +47,7 @@ function Navbar({ setCategory, activeCategory }) {
         <h1
           onClick={() => {
             navigate("/");
-            setCategory("all");
+            setCategory && setCategory("all");
             setOpen(false);
           }}
           className="text-blue-600 font-bold text-xl cursor-pointer"
@@ -34,7 +59,7 @@ function Navbar({ setCategory, activeCategory }) {
         <div className="hidden md:flex gap-6 items-center">
 
           <button
-            onClick={() => setCategory("hotel")}
+            onClick={() => setCategory && setCategory("hotel")}
             className={`transition ${
               activeCategory === "hotel"
                 ? "text-blue-600 font-semibold"
@@ -45,7 +70,7 @@ function Navbar({ setCategory, activeCategory }) {
           </button>
 
           <button
-            onClick={() => setCategory("room")}
+            onClick={() => setCategory && setCategory("room")}
             className={`transition ${
               activeCategory === "room"
                 ? "text-blue-600 font-semibold"
@@ -56,7 +81,7 @@ function Navbar({ setCategory, activeCategory }) {
           </button>
 
           <button
-            onClick={() => setCategory("partner")}
+            onClick={() => setCategory && setCategory("partner")}
             className={`transition ${
               activeCategory === "partner"
                 ? "text-blue-600 font-semibold"
@@ -72,6 +97,24 @@ function Navbar({ setCategory, activeCategory }) {
           >
             List Your Room
           </button>
+
+          {/* ===== Auth Button ===== */}
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="border border-red-500 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition"
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("/login")}
+              className="border border-blue-600 text-blue-600 px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition"
+            >
+              Login
+            </button>
+          )}
+
         </div>
 
         {/* ===== Mobile Hamburger ===== */}
@@ -90,7 +133,7 @@ function Navbar({ setCategory, activeCategory }) {
 
           <button
             onClick={() => {
-              setCategory("hotel");
+              setCategory && setCategory("hotel");
               setOpen(false);
             }}
             className="block w-full text-left"
@@ -100,7 +143,7 @@ function Navbar({ setCategory, activeCategory }) {
 
           <button
             onClick={() => {
-              setCategory("room");
+              setCategory && setCategory("room");
               setOpen(false);
             }}
             className="block w-full text-left"
@@ -110,7 +153,7 @@ function Navbar({ setCategory, activeCategory }) {
 
           <button
             onClick={() => {
-              setCategory("partner");
+              setCategory && setCategory("partner");
               setOpen(false);
             }}
             className="block w-full text-left"
@@ -127,6 +170,29 @@ function Navbar({ setCategory, activeCategory }) {
           >
             List Your Room
           </button>
+
+          {/* ===== Mobile Auth Button ===== */}
+          {isLoggedIn ? (
+            <button
+              onClick={() => {
+                handleLogout();
+                setOpen(false);
+              }}
+              className="w-full border border-red-500 text-red-500 py-2 rounded-full"
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                navigate("/login");
+                setOpen(false);
+              }}
+              className="w-full border border-blue-600 text-blue-600 py-2 rounded-full"
+            >
+              Login
+            </button>
+          )}
 
         </div>
       )}
