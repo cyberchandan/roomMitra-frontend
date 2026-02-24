@@ -41,7 +41,8 @@ function RoomDetail() {
       <Navbar />
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="max-w-6xl mx-auto px-4 py-10">
+        {/* 🔹 Added pb-32 so content doesn't hide behind sticky booking bar */}
+<div className="max-w-6xl mx-auto px-4 py-10 pb-32">
 
           {/* ================= IMAGE SLIDER ================= */}
 
