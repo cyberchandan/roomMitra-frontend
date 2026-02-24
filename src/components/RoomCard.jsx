@@ -6,7 +6,7 @@ function RoomCard({ room }) {
 
   return (
     <div
-      onClick={() => navigate(`/room/${room.id}`)}
+      onClick={() => navigate(`/room/${room._id}`)}
       className="bg-white rounded-3xl shadow-md hover:shadow-2xl transition cursor-pointer overflow-hidden group"
     >
 
@@ -27,7 +27,11 @@ function RoomCard({ room }) {
         </h3>
 
         <p className="text-gray-500 text-sm mt-1">
-          📍 {room.location}
+          📍 {room?.location?.coordinates && (
+  <p className="text-xs text-gray-400">
+    Lat: {room.location.coordinates[1]} | Lng: {room.location.coordinates[0]}
+  </p>
+)}
         </p>
 
         <p className="text-blue-600 font-semibold mt-2">

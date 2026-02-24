@@ -1,53 +1,68 @@
 import { useState, useEffect, useRef } from "react";
 import Navbar from "../components/Navbar";
 import RoomCard from "../components/RoomCard";
-import rooms from "../data/rooms";
+import { getRooms } from "../api/roomService";
 
 function Home() {
 
   /* ================= CATEGORY STATE ================= */
-
-  // 🔹 Controls Hotel / Room / Partner filtering
   const [category, setCategory] = useState("all");
 
   /* ================= SMART FILTER STATES ================= */
-
   const [search, setSearch] = useState("");
   const [maxPrice, setMaxPrice] = useState(10000);
 
-  /* ================= INFINITE SCROLL STATE ================= */
+  /* ================= API STATES ================= */
+  const [rooms, setRooms] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-  const [visibleCount, setVisibleCount] = useState(6);
-
-  // 🔹 Ref for intersection observer
   const loadMoreRef = useRef(null);
 
-  /* ================= FILTER LOGIC ================= */
+  /* ================= FETCH ROOMS ================= */
 
-  const filteredRooms = rooms.filter((room) => {
+  const fetchRooms = async () => {
+    try {
+      setLoading(true);
+  
+      const res = await getRooms(page);
+      const apiData = res.data;
+  
+      const newRooms = apiData?.rooms || [];
+  
+      setHasMore(apiData?.hasMore ?? false);
+  
+      setRooms((prev) => {
+        const existingIds = new Set(prev.map((r) => r._id));
+  
+        const filteredNew = newRooms.filter(
+          (room) => !existingIds.has(room._id)
+        );
+  
+        return [...prev, ...filteredNew];
+      });
+  
+    } catch (err) {
+      console.error("Error fetching rooms:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const matchSearch =
-      room.location.toLowerCase().includes(search.toLowerCase());
+  /* ================= LOAD WHEN PAGE CHANGES ================= */
 
-    const matchPrice =
-      room.price <= maxPrice;
-
-    const matchCategory =
-      category === "all" ? true : room.category === category;
-
-    return matchSearch && matchPrice && matchCategory;
-  });
-
-  // 🔹 Only show limited rooms based on scroll
-  const visibleRooms = filteredRooms.slice(0, visibleCount);
+  useEffect(() => {
+    fetchRooms();
+  }, [page]);
 
   /* ================= RESET WHEN FILTER CHANGES ================= */
 
   useEffect(() => {
-    // 🔹 Reset infinite scroll when filter/search/category changes
-    setVisibleCount(6);
+    setRooms([]);
+    setPage(1);
+    setHasMore(true);
 
-    // 🔹 Scroll to top smoothly
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -61,16 +76,8 @@ function Home() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0];
-
-        if (entry.isIntersecting) {
-
-          // 🔹 Prevent overflow
-          setVisibleCount((prev) =>
-            prev + 3 > filteredRooms.length
-              ? filteredRooms.length
-              : prev + 3
-          );
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          setPage((prev) => prev + 1);
         }
       },
       { threshold: 1 }
@@ -86,11 +93,30 @@ function Home() {
       }
     };
 
-  }, [filteredRooms]);
+  }, [hasMore, loading]);
+
+  /* ================= SAFE FRONTEND FILTER ================= */
+
+  const filteredRooms = rooms.filter((room) => {
+
+    const cityText = room?.city || "";
+
+    const matchSearch =
+      cityText.toLowerCase().includes(search.toLowerCase());
+
+    const matchPrice =
+      Number(room?.price || 0) <= maxPrice;
+
+    const matchCategory =
+      category === "all"
+        ? true
+        : room?.listingType === category;
+
+    return matchSearch && matchPrice && matchCategory;
+  });
 
   return (
     <>
-      {/* 🔹 Pass category + setter to navbar */}
       <Navbar
         setCategory={setCategory}
         activeCategory={category}
@@ -99,7 +125,6 @@ function Home() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
 
         {/* ================= HERO ================= */}
-
         <div className="max-w-6xl mx-auto px-4 pt-12 pb-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800">
             Find Your Perfect Room
@@ -110,12 +135,10 @@ function Home() {
         </div>
 
         {/* ================= SMART FILTER BAR ================= */}
-
         <div className="sticky top-16 z-40 bg-white/80 backdrop-blur-md shadow-md py-4">
-
           <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-4 items-center">
 
-            {/* 🔹 Location Search */}
+            {/* Search */}
             <input
               type="text"
               placeholder="Search location..."
@@ -124,7 +147,7 @@ function Home() {
               className="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
-            {/* 🔹 Price Slider */}
+            {/* Price Slider */}
             <div className="flex items-center gap-3 w-full md:w-72">
               <span className="text-sm text-gray-600">₹0</span>
 
@@ -146,30 +169,27 @@ function Home() {
         </div>
 
         {/* ================= ROOM GRID ================= */}
-
         <div className="max-w-6xl mx-auto px-4 mt-10 pb-20">
 
-          {/* 🔹 Result count */}
           <p className="mb-6 text-gray-500">
             {filteredRooms.length} rooms found
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
 
-            {visibleRooms.map((room) => (
-              <RoomCard key={room.id} room={room} />
+            {filteredRooms.map((room) => (
+              <RoomCard key={room._id} room={room} />
             ))}
 
           </div>
 
-          {/* 🔹 Infinite Scroll Trigger */}
-          {visibleCount < filteredRooms.length && (
+          {hasMore && (
             <div
               ref={loadMoreRef}
               className="h-16 flex items-center justify-center mt-8"
             >
               <p className="text-gray-400 animate-pulse">
-                Loading more rooms...
+                {loading ? "Loading more rooms..." : "Scroll to load more"}
               </p>
             </div>
           )}
