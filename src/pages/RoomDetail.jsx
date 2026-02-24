@@ -199,11 +199,40 @@ function RoomDetail() {
         </div>
       </div>
 
-      {/* ================= CHAT BUTTON ================= */}
+      {/* ================= STICKY BOOKING BAR ================= */}
 
-      <button className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full shadow-xl hover:scale-105 transition">
-        💬 Live Chat
-      </button>
+<div className="fixed bottom-0 left-0 w-full bg-white shadow-2xl border-t z-50">
+
+<div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+
+  {/* 🔹 Price Info */}
+  <div>
+    <p className="text-lg font-semibold text-blue-600">
+      ₹{room.price} / month
+    </p>
+    <p className="text-xs text-gray-500">
+      Fully Furnished • Ready to Move
+    </p>
+  </div>
+
+  {/* 🔹 Action Buttons */}
+  <div className="flex gap-3">
+
+    <button className="px-5 py-2 border border-blue-600 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition">
+      💬 Chat
+    </button>
+
+    <button className="px-5 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow hover:scale-105 transition">
+      📞 Contact
+    </button>
+
+  </div>
+
+</div>
+
+</div>
+
+     
 
     </>
   );
