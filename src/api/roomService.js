@@ -8,13 +8,17 @@ export const getRooms = (page = 1) =>
 export const getRoomById = (id) =>
   API.get(`/rooms/${id}`);
 
-// CREATE room
+// CREATE room (FormData support)
 export const createRoom = (data) =>
-  API.post(`/rooms`, data);
+  API.post(`/rooms`, data, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
 
-// UPDATE room
+// UPDATE room (FormData support)
 export const updateRoom = (id, data) =>
-  API.put(`/rooms/${id}`, data);
+  API.put(`/rooms/${id}`, data, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
 
 // DELETE room
 export const deleteRoom = (id) =>
