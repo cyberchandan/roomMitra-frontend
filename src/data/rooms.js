@@ -1,44 +1,66 @@
-// 🔹 Fake room data (Later this will come from backend API)
+// 🔹 Fake room data (Later replace with backend API)
 
-const rooms = Array.from({ length: 12 }, (_, i) => ({
+/*
+  Using stable random image seed
+  So every room gets different image
+  But UI will not break
+*/
+
+const getRandomImage = (seed) =>
+  `https://picsum.photos/seed/room${seed}/800/600`;
+
+const rooms = Array.from({ length: 100 }, (_, i) => ({
   id: i + 1,
 
-  // 🔹 Basic Info
+  /* ================= BASIC INFO ================= */
+
   title: `Luxury Room ${i + 1}`,
-  price: 6000 + i * 500,
-  location: i % 2 === 0 ? "Delhi" : "Noida",
-  verified: i % 2 === 0, // 🔹 Verified badge toggle
 
-  // 🔹 Room rating (1–5)
-rating: 4.3,
+  price: 6000 + (i % 20) * 300,
 
-// 🔹 Amenities list (later dynamic from backend)
-amenities: ["WiFi", "AC", "Parking", "Attached Bathroom"],
+  location:
+    i % 3 === 0
+      ? "Delhi"
+      : i % 3 === 1
+      ? "Noida"
+      : "Gurgaon",
 
-  // 🔹 Multiple images for slider
-  images: [
-    `https://source.unsplash.com/800x600/?bedroom&sig=${i + 1}`,
-    `https://source.unsplash.com/800x600/?apartment&sig=${i + 20}`,
-    `https://source.unsplash.com/800x600/?interior&sig=${i + 40}`,
+  verified: i % 4 === 0,
+
+  /* ================= RATING ================= */
+
+  rating: 4.0 + (i % 5) * 0.1,
+
+  /* ================= AMENITIES ================= */
+
+  amenities: [
+    "WiFi",
+    "AC",
+    "Parking",
+    "Attached Bathroom",
+    ...(i % 2 === 0 ? ["Balcony"] : []),
   ],
 
-  // 🔹 Multiple demo images for better visual feel
-images: [
-  "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
-  "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
-  "https://images.unsplash.com/photo-1507089947368-19c1da9775ae",
-],
+  /* ================= IMAGES ================= */
 
-  // 🔹 Owner Info
+  images: [
+    getRandomImage(i + 1),
+    getRandomImage(i + 200),
+    getRandomImage(i + 400),
+  ],
+
+  /* ================= OWNER INFO ================= */
+
   owner: {
-    name: "Rahul Sharma",
-    phone: "9876543210",
-    email: "rahul@email.com",
+    name: `Owner ${i + 1}`,
+    phone: `98765${(10000 + i).toString().slice(-5)}`,
+    email: `owner${i + 1}@roommitra.com`,
   },
 
-  // 🔹 Map Coordinates (Future Google Map integration)
-  lat: 28.6139 + i * 0.01,
-  lng: 77.2090 + i * 0.01,
+  /* ================= MAP COORDINATES ================= */
+
+  lat: 28.6139 + i * 0.002,
+  lng: 77.2090 + i * 0.002,
 }));
 
 export default rooms;

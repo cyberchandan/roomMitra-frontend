@@ -2,46 +2,42 @@ import { useNavigate } from "react-router-dom";
 
 function RoomCard({ room }) {
 
-  // 🔹 Hook for programmatic navigation
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden">
+    <div
+      onClick={() => navigate(`/room/${room.id}`)}
+      className="bg-white rounded-3xl shadow-md hover:shadow-2xl transition cursor-pointer overflow-hidden group"
+    >
 
-      {/* 🔹 Room Image Section */}
-      <div className="h-48 overflow-hidden">
+      {/* 🔹 Image Section */}
+      <div className="h-52 overflow-hidden">
         <img
-          src={room.image}
+          src={room.images[0]}
           alt={room.title}
-          className="w-full h-full object-cover hover:scale-105 transition duration-300"
+          className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
         />
       </div>
 
-      {/* 🔹 Room Info Section */}
-      <div className="p-4 space-y-1">
+      {/* 🔹 Content Section */}
+      <div className="p-5">
 
-        {/* 🔹 Room Title */}
-        <h2 className="font-semibold text-lg">
+        <h3 className="font-semibold text-lg text-gray-800">
           {room.title}
-        </h2>
+        </h3>
 
-        {/* 🔹 Location */}
-        <p className="text-gray-500 text-sm">
-          {room.location}
+        <p className="text-gray-500 text-sm mt-1">
+          📍 {room.location}
         </p>
 
-        {/* 🔹 Price */}
-        <p className="text-blue-600 font-semibold">
+        <p className="text-blue-600 font-semibold mt-2">
           ₹{room.price}/month
         </p>
 
-        {/* 🔹 Navigate to Room Detail Page */}
-        <button
-          onClick={() => navigate(`/room/${room.id}`)}
-          className="mt-3 w-full border border-blue-600 text-blue-600 py-2 rounded-full hover:bg-blue-600 hover:text-white transition"
-        >
-          View Details
-        </button>
+        {/* 🔹 Small rating preview */}
+        <div className="text-yellow-400 text-sm mt-2">
+          ★★★★☆ <span className="text-gray-500 ml-1">{room.rating}</span>
+        </div>
 
       </div>
 
