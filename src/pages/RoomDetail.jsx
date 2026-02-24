@@ -125,6 +125,35 @@ function RoomDetail() {
 
             </div>
           </div>
+{/* ================= CUSTOM DETAILS ================= */}
+
+{room.customDetails && room.customDetails.length > 0 && (
+  <div className="mt-8 bg-white rounded-3xl p-8 shadow-lg">
+
+    <h2 className="text-xl font-semibold mb-6">
+      📋 Additional Details
+    </h2>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      {room.customDetails.map((detail, index) => (
+        <div
+          key={index}
+          className="flex justify-between border-b pb-2"
+        >
+          <span className="text-gray-600">
+            {detail.key}
+          </span>
+          <span className="font-medium">
+            {detail.value}
+          </span>
+        </div>
+      ))}
+
+    </div>
+
+  </div>
+)}
 
           {/* ================= OWNER SECTION ================= */}
 
